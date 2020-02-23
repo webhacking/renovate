@@ -173,6 +173,7 @@ export interface Upgrade<T = Record<string, any>>
   newDigest?: string;
   newFrom?: string;
   newMajor?: number;
+  newName?: string;
   newValue?: string;
   newVersion?: string;
   packageFile?: string;

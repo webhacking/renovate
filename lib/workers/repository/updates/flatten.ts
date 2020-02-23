@@ -15,6 +15,15 @@ function getUpdateTypeRules(packageRules: PackageRule[]): PackageRule[] {
   return packageRules.filter(rule => is.nonEmptyArray(rule.updateTypes));
 }
 
+function sanitizeDepName(depName: string): string {
+  return depName
+    .replace('@types/', '')
+    .replace('@', '')
+    .replace(/\//g, '-')
+    .replace(/\s+/g, '-')
+    .toLowerCase();
+}
+
 export function flattenUpdates(
   config: RenovateConfig,
   packageFiles: Record<string, any[]>
@@ -27,6 +36,7 @@ export function flattenUpdates(
     'pin',
     'digest',
     'lockFileMaintenance',
+    'deprecationReplacement',
   ];
   for (const [manager, files] of Object.entries(packageFiles)) {
     const managerConfig = getManagerConfig(config, manager);
@@ -56,12 +66,10 @@ export function flattenUpdates(
             updateConfig = applyPackageRules(updateConfig);
             delete updateConfig.packageRules;
             updateConfig.depNameSanitized = updateConfig.depName
-              ? updateConfig.depName
-                  .replace('@types/', '')
-                  .replace('@', '')
-                  .replace(/\//g, '-')
-                  .replace(/\s+/g, '-')
-                  .toLowerCase()
+              ? sanitizeDepName(updateConfig.depName)
+              : undefined;
+            updateConfig.newNameSanitized = updateConfig.newName
+              ? sanitizeDepName(updateConfig.newName)
               : undefined;
             if (
               updateConfig.language === LANGUAGE_DOCKER &&
