@@ -13,6 +13,9 @@ import {
 } from './common';
 import * as semverVersioning from '../versioning/semver';
 import datasources from './api.generated';
+import { applyPackageRules } from '../util/package-rules';
+import { mergeChildConfig } from '../config';
+import { clone } from '../util/clone';
 
 export * from './common';
 
@@ -27,6 +30,20 @@ function load(datasource: string): Promise<Datasource> {
 }
 
 type GetReleasesInternalConfig = GetReleasesConfig & GetPkgReleasesConfig;
+function applyReplacements(
+  dep: ReleaseResult,
+  config: PkgReleaseConfig
+): ReleaseResult {
+  let depConfig = mergeChildConfig(config, dep);
+  depConfig = applyPackageRules(depConfig);
+  if (depConfig.replacementName && depConfig.replacementVersion) {
+    const ret = clone(dep);
+    ret.replacementName = depConfig.replacementName;
+    ret.replacementVersion = depConfig.replacementVersion;
+    return ret;
+  }
+  return dep;
+}
 
 async function fetchReleases(
   config: GetReleasesInternalConfig
@@ -38,7 +55,7 @@ async function fetchReleases(
   }
   const dep = await (await load(datasource)).getReleases(config);
   addMetaData(dep, datasource, config.lookupName);
-  return dep;
+  return applyReplacements(dep, config);
 }
 
 function getRawReleases(

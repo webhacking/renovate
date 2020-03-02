@@ -36,7 +36,7 @@ export function flattenUpdates(
     'pin',
     'digest',
     'lockFileMaintenance',
-    'deprecationReplacement',
+    'replacement',
   ];
   for (const [manager, files] of Object.entries(packageFiles)) {
     const managerConfig = getManagerConfig(config, manager);
