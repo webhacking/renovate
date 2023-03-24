@@ -110,7 +110,7 @@
     "yarn": ">=1.10.1"
   },
   "dependencies": {
-    "@renovate/pep440": "0.4.1",
+    "@renovatebot/pep440": "1.0.0",
     "@sindresorhus/is": "2.1.0",
     "@snyk/ruby-semver": "2.1.0",
     "@yarnpkg/lockfile": "1.1.0",
